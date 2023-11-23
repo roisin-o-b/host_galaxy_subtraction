@@ -9,40 +9,35 @@ A series of scripts forming a pipeline to subtract the host galaxy contribution 
 - writes all info to counts file
 
 # combined_plot.py 
-- takes count table, averages over obs per night, finds photon error, writes to obs file, converst counts to mags and adds zeropoint, saves mrk 1018 mags and mags error, plots and saves combined LC
+- averages the counts over the observations per night, finds the error, and writes to file
+- converts counts to magnitudes and adds the zeropoint value, finds these uncertainties, and writes to file
+- plots and saves initial light curve
 
-*****************2017_07_30_VIMOS_mean/reproject***************
+# reproj.py 
+- takes an image and scales, rotates and conserves flux to match another
 
-reproj.py - takes high def image,scales, rotates and conserves flux to match stella images
-
-*****************2017_07_30_VIMOS_mean***************
-
-stella_pipeline_star.py - contains function that does host subtraction
-    inputs: count table, background images, high def host galaxy image, high def ref star 3 count, high def obs date
-    first for loop: for each stella obs; takes stella seeing, convolves with host galaxy image, adds stella background, adds noise, subtracts bakckground from created image, find host centroid and do photometry, save host contribution for each obs, find ref star 3 counts from high def obs date
-    after first for loop: find ratio between stella ref 3 star counts and high def star count, scale host according to ref star ratio, subtract host counts from combined counts
-    second for loop: average over obs per night, return obs counts
+# stella_pipeline_star.py 
+- contains the functions necessary for host subtraction
+- the inputs needed are: a count table, background images, a high-definition host-galaxy image, a count value for a reference star in the high-def. image, and the high-def. image observation date
+- the first for loop takes each STELLA observation and convolves with the reprojected host-galaxy image, adds the STELLA background, adds noise, subtracts the background from the created image, finds the host-galaxy centroid and does photometry, saves the host-galaxy contribution for each STELLA observation, and matches the count value for the reference star using the high-defintion image observation date
+- after the first for loop, the script calculates the ratio between the reference star counts in the STELLA image and those in the high-def. image, scales the host-galaxy counts according to the reference star ratio, and subtracts the resultant host-galaxy counts from the combined count value
+- the second for loop averages over the observations per night and returns the count values
     
-multiruns.py - import function described above and runs it 1000 times, saves obs counts for each run
+# multiruns.py 
+- imports function described above and runs it 1000 times, saving obsservation counts for each run
 
-lc_fns.py - functions needed to create the light curve 
-    group_dps: saves a table of dates for later, extracts all outputs from each run and arranges by date, sorts from highest to lowest and saves each range per by date
-    agnonlystats: takes range of dps for each date and extracts expectation value and 1, 2, 3 sigma values, saves in table arranged by date
-    plot_agnstats: convert to mags, separate errors from limits, plots and saves data points
+# lc_fns.py 
+- functions needed to create the light curve 
+- _group_dps_ saves a table of dates for later, extracts all outputs from each run and arranges by date, sorts from highest to lowest and saves each range per by date
+- _agnonlystats_ takes the range of data points for each date, and extracts the expectation value and 1, 2, 3 sigma values, then saves these values in a table, arranged by date
+- _plot_agnstats_ converts the counts to magnitudes, separates the errors from the limits, plots this, and saves data points
     
-call_fns_on_data.py
-    
-***************************2016_09_24_VIMOS_onesigmabright***********************
-
-same procedure as in 2017_07_30_VIMOS_mean to find upper shaded region systematic error
-
-
-****************************2017_09_14_GMOS_onesigmafaint**************************
-
-same procedure as in 2017_07_30_VIMOS_mean to find upper shaded region systematic error
-
-***************************final_plot****************************
-
-plot_lcs.py - takes the three outputs for the three high def images, uses centre and 1 sigma error if non-zero, if zero adds lower limit, creates shaded region behind data points, adds grey block for sunblock period, saves figure
-
+# call_fns_on_data.py
+- calls the above functions on the data from the multiple runs
+  
+# plot_lcs.py 
+- takes the three outputs for three high-def. images (these approximate the expectation value and 1 sigma errors in the choice of host galaxy image)
+- uses the central value and, if non-zero, the 1-sigma error values
+- if the 1-sigma error values are zero, the script adds the lower limit
+- plots the data points, creates the shaded region behind the data points, adds the grey block for the sunblock period, and saves the figure
     
